@@ -12,4 +12,4 @@ SPDX-License-Identifier: Unlicense
 - [] Develop PXE HTTP image to serve installer artifacts
 - [] Build and test F42 installers
 - [] Cleanup Makefile to leverage helper scripts where appropriate
-- [] Setup BorgBackup to "pull" backups from target machines
+- [] Embed coreos host ignition in PXE img and add extra steps to unique ignition files
