@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+k0s/k0s.Cluster.yaml
+.cache
+coreos.iso
+external-dns/dnsendpoints.yaml
+
+# Environment files
+.env
+
+# Nix
+.direnv/
+result/
+*.drv

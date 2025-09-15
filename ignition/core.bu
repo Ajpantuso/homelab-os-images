@@ -1,0 +1,77 @@
+variant: fcos
+version: 1.5.0
+passwd:
+  users:
+  - name: labadm
+    home_dir: /home/labadm
+    groups:
+    - wheel
+    shell: /bin/bash
+storage:
+  disks:
+  - device: /dev/sda
+    wipe_table: true
+    partitions:
+    - size_mib: 0
+      start_mib: 0
+      wipe_partition_entry: true
+      label: ebs
+  filesystems:
+    - path: /var/openebs/local
+      device: /dev/disk/by-partlabel/ebs
+      format: xfs
+      label: ebs
+      wipe_filesystem: true
+      with_mount_unit: true
+  directories:
+  - path: /srv/www
+    user:
+      name: labadm
+    group:
+      name: labadm
+  files:
+  - path: /etc/zincati/config.d/51-rollout-wariness.toml
+    contents:
+      local: overlays/coreos/etc/zincati/config.d/51-rollout-wariness.toml
+  - path: /etc/zincati/config.d/55-updates-strategy.toml
+    contents:
+      local: overlays/coreos/etc/zincati/config.d/55-updates-strategy.toml
+  - path: /etc/sudoers.d/01_wheel
+    mode: 0440
+    contents:
+      local: overlays/coreos/etc/sudoers.d/01_wheel
+  - path: /etc/ssh/sshd_config.d/90-ssh-ca.conf
+    contents:
+      local: overlays/coreos/etc/ssh/sshd_config.d/90-ssh-ca.conf
+  - path: /etc/ansible/hosts
+    contents:
+      local: overlays/core/etc/ansible/hosts
+  - path: /var/lib/tftpboot/ipxe-x86_64.efi
+    contents:
+      local: overlays/core/var/lib/tftpboot/ipxe-x86_64.efi
+  - path: /var/lib/tftpboot/undionly.kpxe
+    contents:
+      local: overlays/core/var/lib/tftpboot/undionly.kpxe
+  - path: /var/lib/tftpboot/menu/boot.ipxe
+    contents:
+      local: overlays/core/var/lib/tftpboot/menu/boot.ipxe
+systemd:
+  units:
+  - name: rpm-ostree-install-extra.service
+    enabled: true
+    contents_local: overlays/core/etc/systemd/system/rpm-ostree-install-extra.service
+  - name: nginx-setup.service
+    enabled: true
+    contents_local: overlays/core/etc/systemd/system/nginx-setup.service
+  - name: ansible-pull.service
+    enabled: false
+    contents_local: overlays/coreos/etc/systemd/system/ansible-pull.service
+  - name: ansible-pull.timer
+    enabled: true
+    contents_local: overlays/coreos/etc/systemd/system/ansible-pull.timer
+  - name: scheduled-reboot.service
+    enabled: false
+    contents_local: overlays/coreos/etc/systemd/system/scheduled-reboot.service
+  - name: scheduled-reboot.timer
+    enabled: true
+    contents_local: overlays/coreos/etc/systemd/system/scheduled-reboot.timer

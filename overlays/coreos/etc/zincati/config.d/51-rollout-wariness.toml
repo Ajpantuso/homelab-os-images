@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+[identity]
+rollout_wariness = 0.5

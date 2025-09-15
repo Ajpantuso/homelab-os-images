@@ -1,0 +1,7 @@
+[Unit]
+Description=Runs Ansible Pull
+ConditionFileIsExecutable=/usr/bin/ansible-pull
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ansible-pull -U https://github.com/ajpantuso/homelab-infra ansible/main.yaml

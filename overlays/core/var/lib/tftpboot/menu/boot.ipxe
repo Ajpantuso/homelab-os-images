@@ -1,0 +1,49 @@
+#!ipxe
+
+:start
+menu PXE Boot Options
+item shell iPXE shell
+item fedora-coreos40-k0s-bm-net Fedora CoreOS 40 K0S Bare Metal
+item fedora-coreos40-k0s-vm-net Fedora CoreOS 40 K0S Virtual Machine
+item fedora-coreos40-core-net Fedora CoreOS 40 Core
+item fedora-coreos40-pki-net Fedora CoreOS 40 PKI
+item fedora-server40-hypervisor-net Fedora Server 40 Hypervisor
+item exit  Exit to BIOS
+
+choose --default fedora-coreos40-k0s-net --timeout 10000 option && goto ${option}
+
+:shell
+shell
+
+:fedora-coreos40-k0s-bm-net
+set BASEURL http://pxe.ajphome.com/os/fedora/coreos/40.20240416.3.1/x86_64
+kernel ${BASEURL}/k0s-live-kernel initrd=main ignition.firstboot ignition.platform.id=metal coreos.live.rootfs_url=${BASEURL}/k0s-live-rootfs.img coreos.inst.install_dev=/dev/nvme0n1 coreos.inst.ignition_url=${BASEURL}/k0s-bm.ign
+initrd --name main ${BASEURL}/k0s-live-initramfs.img
+boot
+
+:fedora-coreos40-k0s-vm-net
+set BASEURL http://pxe.ajphome.com/os/fedora/coreos/40.20240416.3.1/x86_64
+kernel ${BASEURL}/k0s-live-kernel initrd=main ignition.firstboot ignition.platform.id=metal coreos.live.rootfs_url=${BASEURL}/k0s-live-rootfs.img coreos.inst.install_dev=/dev/vda coreos.inst.ignition_url=${BASEURL}/k0s-vm.ign
+initrd --name main ${BASEURL}/k0s-live-initramfs.img
+boot
+
+:fedora-coreos40-core-net
+set BASEURL http://pxe.ajphome.com/os/fedora/coreos/40.20240416.3.1/x86_64
+kernel ${BASEURL}/k0s-live-kernel initrd=main ignition.firstboot ignition.platform.id=metal coreos.live.rootfs_url=${BASEURL}/k0s-live-rootfs.img coreos.inst.install_dev=/dev/mmcblk0 coreos.inst.ignition_url=${BASEURL}/core.ign
+initrd --name main ${BASEURL}/k0s-live-initramfs.img
+boot
+
+:fedora-coreos40-pki-net
+set BASEURL http://pxe.ajphome.com/os/fedora/coreos/40.20240416.3.1/x86_64
+kernel ${BASEURL}/k0s-live-kernel initrd=main ignition.firstboot ignition.platform.id=metal coreos.live.rootfs_url=${BASEURL}/k0s-live-rootfs.img coreos.inst.install_dev=/dev/mmcblk0 coreos.inst.ignition_url=${BASEURL}/pki.ign
+initrd --name main ${BASEURL}/k0s-live-initramfs.img
+boot
+
+:fedora-server40-hypervisor-net
+set BASEURL http://pxe.ajphome.com/os/fedora/server/40/x86_64
+kernel ${BASEURL}/vmlinuz initrd=main inst.repo=https://download.fedoraproject.org/pub/fedora/linux/releases/40/Everything/x86_64/os/ ip=dhcp inst.ks=${BASEURL}/hypervisor.ks
+initrd --name main ${BASEURL}/initrd.img
+boot
+
+:exit
+exit

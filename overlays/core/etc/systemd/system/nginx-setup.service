@@ -1,0 +1,12 @@
+[Unit]
+Description=Ensures proper SELinux context for NGINX
+ConditionPathExists=!/var/lib/%N.stamp
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=chcon system_u:object_r:httpd_sys_content_t:s0 /srv/www
+ExecStart=/bin/touch /var/lib/%N.stamp
+
+[Install]
+WantedBy=multi-user.target
