@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- name: Ensure '/srv/www' directory
+  become: true
+  ansible.builtin.file:
+    path: /srv/www
+    state: directory
+    owner: labadm
+    group: labadm
+- name: Ensure configuration files
+  become: true
+  ansible.builtin.copy:
+    src:  '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+  loop:
+  - src: "{{ overlaysDir }}/core/var/lib/tftpboot/menu/boot.ipxe"
+    dest: /var/lib/tftpboot/menu/boot.ipxe
+    mode: 644

@@ -96,7 +96,7 @@ install \
 
     [Service]
     Type=oneshot
-    ExecStart=/usr/bin/ansible-pull -U https://github.com/ajpantuso/homelab-infra ansible/main.yaml
+    ExecStart=/usr/bin/ansible-pull -U https://github.com/ajpantuso/homelab-os-images ansible/main.yaml
 EOF
     ) /etc/systemd/system/ansible-pull.service
 

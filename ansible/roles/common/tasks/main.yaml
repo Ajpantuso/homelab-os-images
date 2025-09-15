@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- import_tasks: coreos.yaml
+  when: '"fedora-coreos" in ansible_proc_cmdline.ostree'
+- name: Ensure 'labadm' user
+  become: true
+  ansible.builtin.user:
+    name: labadm
+    home: /home/labadm
+    groups:
+    - wheel
+    shell: /bin/bash
+- name: Ensure configuration files
+  become: true
+  ansible.builtin.copy:
+    src:  '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+  loop:
+  - src: "{{ overlaysDir }}/coreos/etc/systemd/system/scheduled-reboot.service"
+    dest: /etc/systemd/system/scheduled-reboot.service
+    mode: 644
+  - src: "{{ overlaysDir }}/coreos/etc/systemd/system/scheduled-reboot.timer"
+    dest: /etc/systemd/system/scheduled-reboot.timer
+    mode: 644
+  - src: "{{ overlaysDir }}/coreos/etc/ssh/sshd_config.d/90-ssh-ca.conf"
+    dest: /etc/ssh/sshd_config.d/90-ssh-ca.conf
+    mode: 644
+- name: Enable systemd services
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    state: started
+    enabled: true
+    daemon_reload: true
+  loop:
+  - name: scheduled-reboot.timer
+- name: Fetch SSH CA public key from Vault
+  become: true
+  ansible.builtin.uri:
+    url: "{{ vault_ssh_ca_url }}"
+    method: GET
+    dest: /etc/ssh/trusted-user-ca-keys.pem
+  notify: restart ssh

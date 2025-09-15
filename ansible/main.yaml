@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- ansible.builtin.import_playbook: k0s.yaml
+- ansible.builtin.import_playbook: core.yaml
+- ansible.builtin.import_playbook: pki.yaml

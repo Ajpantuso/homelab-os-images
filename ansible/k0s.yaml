@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- gather_facts: true
+  hosts: k0s
+  roles:
+  - role: common
+  - role: k0s-node

@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- name: Install udisks2
+  become: true
+  community.general.rpm_ostree_pkg:
+    name: udisks2
+    state: present
+- name: Ensure configuration files
+  become: true
+  ansible.builtin.copy:
+    src:  '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+  loop:
+    - src: "{{ overlaysDir }}/coreos/etc/zincati/config.d/51-rollout-wariness.toml"
+      dest: /etc/zincati/config.d/51-rollout-wariness.toml
+      mode: 544
+    - src: "{{ overlaysDir }}/coreos/etc/zincati/config.d/55-updates-strategy.toml"
+      dest: /etc/zincati/config.d/55-updates-strategy.toml
+      mode: 544
+    - src: "{{ overlaysDir }}/coreos/etc/sudoers.d/01_wheel"
+      dest: /etc/sudoers.d/01_wheel
+      mode: 440
