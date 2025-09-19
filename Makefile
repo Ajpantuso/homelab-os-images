@@ -59,9 +59,22 @@ push-pxe-tftp-image: build-pxe-tftp-image
 	$(CONTAINER_ENGINE) push ${REGISTRY_OPTIONS} "${CONTAINER_REGISTRY}/pxe-tftp:latest"
 .PHONY: push-pxe-tftp-image
 
-build-pxe-tftp-image:
+build-pxe-tftp-image: pull-tftpboot-data
 	$(CONTAINER_ENGINE) build -t "${CONTAINER_REGISTRY}/pxe-tftp:latest" containers/pxe-tftp
 .PHONY: build-pxe-tftp-image
+
+pull-tftpboot-data:
+	mkdir -p $(DATA_DIR)
+	cp -R overlays/ $(DATA_DIR)
+	$(CONTAINER_ENGINE) build -q -t ipxe -f - "$(CURDIR)" << EOF
+		FROM registry.fedoraproject.org/fedora
+		RUN dnf install -y ipxe-bootimgs-x86 ipxe-bootimgs-aarch64
+		VOLUME /out
+		CMD ["sh", "-c", "cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi,ipxe-i386.efi} /out"]
+	EOF
+	$(CONTAINER_ENGINE) run --rm -v "${PROJECT_ROOT}/containers/pxe-tftp/tftpboot:/out:z" localhost/ipxe
+.PHONY: pull-tftpboot-data
+
 
 push-pxe-http-image: build-pxe-http-image
 	$(CONTAINER_ENGINE) push ${REGISTRY_OPTIONS} "${CONTAINER_REGISTRY}/pxe-http:latest"
@@ -126,7 +139,7 @@ core-arm-install: core-generate-ignition ## Install CoreOS on ARM device
 	rm -rf $${mnt}
 .PHONY: core-arm-install
 
-k0s-generate-ignition: common-pre-gen-ignition ## Generate k0s ignition files
+k0s-generate-ignition:
 	mkdir -p $$(dirname $(K0S_BM_IGNITION_OUTPUT))
 	butane \
 		--pretty --strict \
@@ -141,7 +154,7 @@ k0s-generate-ignition: common-pre-gen-ignition ## Generate k0s ignition files
 		> $(K0S_VM_IGNITION_OUTPUT)
 .PHONY: k0s-generate-ignition
 
-core-generate-ignition: common-pre-gen-ignition ## Generate core ignition file
+core-generate-ignition:
 	mkdir -p $$(dirname $(CORE_IGNITION_PATH))
 	butane \
 		--pretty --strict \
@@ -150,7 +163,7 @@ core-generate-ignition: common-pre-gen-ignition ## Generate core ignition file
 		> $(CORE_IGNITION_PATH)
 .PHONY: core-generate-ignition
 
-pki-generate-ignition: common-pre-gen-ignition ## Generate PKI ignition file
+pki-generate-ignition:
 	mkdir -p $$(dirname $(PKI_IGNITION_PATH))
 	butane \
 		--pretty --strict \
@@ -158,18 +171,6 @@ pki-generate-ignition: common-pre-gen-ignition ## Generate PKI ignition file
 		< $(PKI_BUTANE_PATH) \
 		> $(PKI_IGNITION_PATH)
 .PHONY: pki-generate-ignition
-
-common-pre-gen-ignition: ## Prepare common ignition generation dependencies
-	mkdir -p $(DATA_DIR)
-	cp -R overlays/ $(DATA_DIR)
-	$(CONTAINER_ENGINE) build -q -t ipxe -f - "$(CURDIR)" << EOF
-		FROM registry.fedoraproject.org/fedora
-		RUN dnf install -y ipxe-bootimgs-x86 ipxe-bootimgs-aarch64
-		VOLUME /out
-		CMD ["sh", "-c", "cp /usr/share/ipxe/{undionly.kpxe,ipxe-x86_64.efi,ipxe-i386.efi} /out"]
-	EOF
-	$(CONTAINER_ENGINE) run --rm -v $(DATA_DIR)/overlays/core/var/lib/tftpboot:/out:z localhost/ipxe
-.PHONY: common-pre-gen-ignition
 
 coreos-generate-iso: ## Generate CoreOS ISO
 	mkdir -p "$(TMP_DIR)"

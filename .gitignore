@@ -13,3 +13,6 @@ containers/pxe-http/os
 .direnv/
 result/
 *.drv
+
+containers/pxe-tftp/tftpboot/ipxe*.efi
+containers/pxe-tftp/tftpboot/undionly.kpxe
