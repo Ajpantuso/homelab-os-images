@@ -1,0 +1,5 @@
+FROM registry.access.redhat.com/ubi9/nginx-126:1-1756959223
+
+COPY os /opt/app-root/src/os
+
+ENTRYPOINT [ "nginx", "-g", "daemon off;"]

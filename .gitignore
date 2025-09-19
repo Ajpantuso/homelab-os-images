@@ -2,10 +2,9 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-k0s/k0s.Cluster.yaml
 .cache
 coreos.iso
-external-dns/dnsendpoints.yaml
+containers/pxe-http/os
 
 # Environment files
 .env

@@ -52,9 +52,6 @@ storage:
   - path: /var/lib/tftpboot/undionly.kpxe
     contents:
       local: overlays/core/var/lib/tftpboot/undionly.kpxe
-  - path: /var/lib/tftpboot/menu/boot.ipxe
-    contents:
-      local: overlays/core/var/lib/tftpboot/menu/boot.ipxe
 systemd:
   units:
   - name: rpm-ostree-install-extra.service

@@ -1,0 +1,4 @@
+FROM dockurr/dnsmasq:latest
+
+COPY boot.ipxe /var/lib/tftpboot/boot.ipxe
+COPY dnsmasq.conf /etc/dnsmasq.conf

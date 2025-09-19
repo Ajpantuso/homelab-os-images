@@ -5,3 +5,4 @@
 ---
 overlaysDir: ../../../overlays
 vault_ssh_ca_url: http://vault.ajphome.com/v1/ssh-ca/public_key
+root_ca_cert_url: http://srv-001.ajphome.com/pki/root-ca.crt

@@ -10,13 +10,3 @@
     state: directory
     owner: labadm
     group: labadm
-- name: Ensure configuration files
-  become: true
-  ansible.builtin.copy:
-    src:  '{{ item.src }}'
-    dest: '{{ item.dest }}'
-    mode: '{{ item.mode }}'
-  loop:
-  - src: "{{ overlaysDir }}/core/var/lib/tftpboot/menu/boot.ipxe"
-    dest: /var/lib/tftpboot/menu/boot.ipxe
-    mode: 644

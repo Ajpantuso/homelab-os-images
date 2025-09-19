@@ -25,7 +25,7 @@ COREOS_VERSION := 42.20250901.3.0
 TARGET_SYSTEM_ARCH := x86_64
 COREOS_DOWNLOAD_URL := https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/$(COREOS_VERSION)/$(TARGET_SYSTEM_ARCH)
 COREOS_ISO_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live.$(TARGET_SYSTEM_ARCH).iso
-COREOS_KERNEL_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-kernel-$(TARGET_SYSTEM_ARCH)
+COREOS_KERNEL_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-kernel.$(TARGET_SYSTEM_ARCH)
 COREOS_INITRAMFS_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-initramfs.$(TARGET_SYSTEM_ARCH).img
 COREOS_ROOTFS_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-rootfs.$(TARGET_SYSTEM_ARCH).img
 
@@ -40,7 +40,7 @@ ARM_INSTALL_RELEASE := 42
 ARM_INSTALL_DEVICE := /dev/sda
 
 # PXE artifacts
-PXE_ROOT_DIR := $(DATA_DIR)/os
+PXE_ROOT_DIR := containers/pxe-http/os
 PXE_COREOS_DIR := $(PXE_ROOT_DIR)/fedora/coreos/$(COREOS_VERSION)/$(TARGET_SYSTEM_ARCH)
 PXE_FEDORA_DIR := $(PXE_ROOT_DIR)/fedora/server/$(FEDORA_VERSION)/$(TARGET_SYSTEM_ARCH)
 K0S_BM_IGNITION_OUTPUT := $(PXE_COREOS_DIR)/k0s-bm.ign
@@ -54,6 +54,22 @@ CORE_IGNITION_PATH := $(PXE_COREOS_DIR)/core.ign
 CORE_BUTANE_PATH := $(CURDIR)/ignition/core.bu
 PKI_IGNITION_PATH := $(PXE_COREOS_DIR)/pki.ign
 PKI_BUTANE_PATH := $(CURDIR)/ignition/pki.bu
+
+push-pxe-tftp-image: build-pxe-tftp-image
+	$(CONTAINER_ENGINE) push ${REGISTRY_OPTIONS} "${CONTAINER_REGISTRY}/pxe-tftp:latest"
+.PHONY: push-pxe-tftp-image
+
+build-pxe-tftp-image:
+	$(CONTAINER_ENGINE) build -t "${CONTAINER_REGISTRY}/pxe-tftp:latest" containers/pxe-tftp
+.PHONY: build-pxe-tftp-image
+
+push-pxe-http-image: build-pxe-http-image
+	$(CONTAINER_ENGINE) push ${REGISTRY_OPTIONS} "${CONTAINER_REGISTRY}/pxe-http:latest"
+.PHONY: push-pxe-http-image
+
+build-pxe-http-image: coreos-generate-pxe
+	$(CONTAINER_ENGINE) build -t "${CONTAINER_REGISTRY}/pxe-http:latest" containers/pxe-http
+.PHONY: build-pxe-http-image
 
 coreos-generate-pxe: k0s-generate-ignition core-generate-ignition pki-generate-ignition ## Generate CoreOS PXE artifacts
 	mkdir -p $(PXE_COREOS_DIR)
@@ -145,7 +161,6 @@ pki-generate-ignition: common-pre-gen-ignition ## Generate PKI ignition file
 
 common-pre-gen-ignition: ## Prepare common ignition generation dependencies
 	mkdir -p $(DATA_DIR)
-	cp $(LABADM_PUBLIC_KEY) $(DATA_DIR)/labadm.pub
 	cp -R overlays/ $(DATA_DIR)
 	$(CONTAINER_ENGINE) build -q -t ipxe -f - "$(CURDIR)" << EOF
 		FROM registry.fedoraproject.org/fedora

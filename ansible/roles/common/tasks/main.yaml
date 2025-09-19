@@ -38,10 +38,16 @@
     daemon_reload: true
   loop:
   - name: scheduled-reboot.timer
+- name: Download root CA certificate
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ root_ca_cert_url }}"
+    dest: /etc/pki/ca-trust/source/anchors/root-ca.crt
+    mode: '644'
+  notify: update ca trust
 - name: Fetch SSH CA public key from Vault
   become: true
-  ansible.builtin.uri:
+  ansible.builtin.get_url:
     url: "{{ vault_ssh_ca_url }}"
-    method: GET
     dest: /etc/ssh/trusted-user-ca-keys.pem
   notify: restart ssh
