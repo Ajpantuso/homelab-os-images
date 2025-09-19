@@ -52,6 +52,10 @@ storage:
   - path: /var/lib/tftpboot/undionly.kpxe
     contents:
       local: overlays/core/var/lib/tftpboot/undionly.kpxe
+  - path: /etc/pki/ca-trust/source/anchors/root-ca.crt
+    mode: 0644
+    contents:
+      source: http://srv-001.ajphome.com/pki/root-ca.crt
 systemd:
   units:
   - name: rpm-ostree-install-extra.service
