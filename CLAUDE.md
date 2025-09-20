@@ -30,7 +30,7 @@ The development shell includes all necessary tools: butane, coreos-installer, cu
 
 ### Directory Structure
 - `ignition/` - Butane configuration files (*.bu) that generate Ignition configs for CoreOS
-  - `core.bu` - Base CoreOS configuration 
+  - `core.bu` - Base CoreOS configuration
   - `k0s-bm.bu` - k0s bare metal node configuration
   - `k0s-vm.bu` - k0s virtual machine configuration
   - `pki.bu` - PKI infrastructure configuration
@@ -44,7 +44,7 @@ The development shell includes all necessary tools: butane, coreos-installer, cu
 The project uses GNU Make with clearly defined targets. Key variables are configured at the top of the Makefile:
 
 - `COREOS_VERSION` - Controls which CoreOS version to use
-- `FEDORA_VERSION` - Controls which Fedora Server version to use  
+- `FEDORA_VERSION` - Controls which Fedora Server version to use
 - `TARGET_SYSTEM_ARCH` - Target architecture (x86_64)
 - `CONTAINER_ENGINE` - Container runtime (docker/podman)
 
@@ -67,7 +67,7 @@ make k0s-generate-ignition
 # Generate core ignition file
 make core-generate-ignition
 
-# Generate PKI ignition file  
+# Generate PKI ignition file
 make pki-generate-ignition
 ```
 

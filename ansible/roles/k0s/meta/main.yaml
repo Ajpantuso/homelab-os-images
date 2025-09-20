@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: Unlicense
 
 ---
-overlaysDir: ../../../overlays
+dependencies: []

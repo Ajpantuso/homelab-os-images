@@ -2,5 +2,5 @@
 #
 # SPDX-License-Identifier: Unlicense
 
-collections:
-- community.general
+---
+k0s_version: v1.30.9+k0s.0

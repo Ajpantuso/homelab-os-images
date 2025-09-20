@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
 FROM dockurr/dnsmasq:latest
 
 COPY tftpboot /var/lib/tftpboot

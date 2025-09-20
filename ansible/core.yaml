@@ -7,4 +7,7 @@
   hosts: core
   roles:
   - role: common
-  - role: core
+  - role: k0s
+    vars:
+      k0s_config_src: "{{ hostvars[inventory_hostname]['overlaysDir'] | default('../../../overlays') }}/core/etc/k0s/k0s.yaml"
+      k0s_address: "{{ lookup('dig', 'core.ajphome.com') }}"

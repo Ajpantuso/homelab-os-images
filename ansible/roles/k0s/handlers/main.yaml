@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- name: Restart k0scontroller
+  become: true
+  ansible.builtin.systemd:
+    name: k0scontroller.service
+    state: restarted
