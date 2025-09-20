@@ -20,6 +20,7 @@
     state: link
     owner: root
     group: root
+  notify: Restart k0scontroller
 
 - name: Ensure '/etc/k0s' directory
   become: true
