@@ -61,9 +61,6 @@ systemd:
   - name: rpm-ostree-install-extra.service
     enabled: true
     contents_local: overlays/core/etc/systemd/system/rpm-ostree-install-extra.service
-  - name: nginx-setup.service
-    enabled: true
-    contents_local: overlays/core/etc/systemd/system/nginx-setup.service
   - name: ansible-pull.service
     enabled: false
     contents_local: overlays/coreos/etc/systemd/system/ansible-pull.service
