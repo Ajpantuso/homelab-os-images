@@ -6,9 +6,9 @@
 - gather_facts: true
   hosts: pki
   pre_tasks:
-  - name: Fetch OIDC configuration from PKI server
+  - name: Fetch OIDC configuration
     ansible.builtin.uri:
-      url: "https://srv-001.ajphome.com/pki/k0s-pki-oidc.yaml"
+      url: "http://srv-001.ajphome.com/pki/k0s-pki-oidc.yaml"
       return_content: true
     register: oidc_config_response
   - name: Parse OIDC configuration
