@@ -10,3 +10,6 @@ SPDX-License-Identifier: Unlicense
 
 - [] Cleanup Makefile to leverage helper scripts where appropriate
 - [] Embed coreos host ignition in PXE img and add extra steps to unique ignition files
+- [] Leverage k0s plans for autoupgrades
+- [] setup oidc for k0s clusters
+- [] periodically apply flux resources for each k0s cluster
