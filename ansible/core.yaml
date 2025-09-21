@@ -23,5 +23,4 @@
       k0s_address: "{{ ansible_default_ipv4.address }}"
       k0s_oidc_issuer_url: "{{ oidc_config.issuer_url }}"
       k0s_oidc_client_id: "{{ oidc_config.client_id }}"
-      k0s_updateconfig_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-infra/refs/heads/main/k0s/periodic-weekly.updateconfig.yaml"
       flux_manifest_url: "https://github.com/Ajpantuso/homelab-infra/flux"
