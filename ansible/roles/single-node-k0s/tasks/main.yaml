@@ -17,16 +17,23 @@
     path: /etc/k0s
     state: directory
     mode: '0755'
+- name: Download k0s configuration template
+  ansible.builtin.get_url:
+    url: "{{ k0s_config_url }}"
+    dest: /tmp/k0s-config.yaml.j2
+    mode: '0644'
+  when: k0s_config_url is defined
+
 - name: Apply k0s configuration
   become: true
   ansible.builtin.template:
-    src: "{{ k0s_config_src }}"
+    src: /tmp/k0s-config.yaml.j2
     dest: /etc/k0s/k0s.yaml
     mode: '0600'
   vars:
     address: "{{ k0s_address }}"
   notify: Restart k0scontroller
-  when: k0s_config_src is defined
+  when: k0s_config_url is defined
 
 - name: Get kubeconfig from k0s
   become: true
