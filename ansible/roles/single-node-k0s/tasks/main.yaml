@@ -27,3 +27,29 @@
     address: "{{ k0s_address }}"
   notify: Restart k0scontroller
   when: k0s_config_src is defined
+
+- name: Get kubeconfig from k0s
+  become: true
+  ansible.builtin.command:
+    cmd: /usr/local/bin/k0s kubeconfig admin
+  register: k0s_kubeconfig
+  changed_when: false
+
+- name: Ensure .kube directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.kube"
+    state: directory
+    mode: '0755'
+
+- name: Save kubeconfig to user's home directory
+  ansible.builtin.copy:
+    content: "{{ k0s_kubeconfig.stdout }}"
+    dest: "{{ ansible_user_dir }}/.kube/config"
+    mode: '0600'
+
+- name: Apply k0s updateconfig
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('url', k0s_updateconfig_url) | from_yaml }}"
+    kubeconfig: "{{ ansible_user_dir }}/.kube/config"
+  when: k0s_updateconfig_url is defined

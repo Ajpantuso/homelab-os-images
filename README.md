@@ -13,3 +13,6 @@ SPDX-License-Identifier: Unlicense
 - [] Leverage k0s plans for autoupgrades
 - [] setup oidc for k0s clusters
 - [] periodically apply flux resources for each k0s cluster
+- [] Renames
+  - infra => core
+  - os-images => infra
