@@ -52,6 +52,21 @@
   ansible.builtin.pip:
     name: kubernetes
 
+- name: Get kubectl stable version
+  ansible.builtin.uri:
+    url: "https://dl.k8s.io/release/stable.txt"
+    return_content: true
+  register: kubectl_version_result
+
+- name: Download kubectl
+  become: true
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version_result.content | trim }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+    owner: root
+    group: root
+
 - name: Apply k0s updateconfig
   kubernetes.core.k8s:
     state: present
