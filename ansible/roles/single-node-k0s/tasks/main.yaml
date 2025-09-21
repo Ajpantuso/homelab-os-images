@@ -47,6 +47,11 @@
     dest: "{{ ansible_user_dir }}/.kube/config"
     mode: '0600'
 
+- name: Install python kubernetes library
+  become: true
+  ansible.builtin.pip:
+    name: kubernetes
+
 - name: Apply k0s updateconfig
   kubernetes.core.k8s:
     state: present
