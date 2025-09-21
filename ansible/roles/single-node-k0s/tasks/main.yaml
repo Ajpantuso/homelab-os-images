@@ -45,6 +45,18 @@
   notify: Restart k0scontroller
   when: k0s_config_url is defined
 
+- name: Check if k0scontroller.service exists
+  become: true
+  ansible.builtin.stat:
+    path: /etc/systemd/system/k0scontroller.service
+  register: k0scontroller_service_stat
+
+- name: Install k0s controller
+  become: true
+  ansible.builtin.command:
+    cmd: /usr/local/bin/k0s install controller --single --config /etc/k0s/k0s.yaml
+  when: not k0scontroller_service_stat.stat.exists
+
 - name: Get kubeconfig from k0s
   become: true
   ansible.builtin.command:
