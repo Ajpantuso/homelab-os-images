@@ -55,6 +55,6 @@
 - name: Apply k0s updateconfig
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('url', k0s_updateconfig_url) | from_yaml_all | list | first }}"
+    src: "{{ k0s_updateconfig_url }}"
     kubeconfig: "{{ ansible_user_dir }}/.kube/config"
   when: k0s_updateconfig_url is defined
