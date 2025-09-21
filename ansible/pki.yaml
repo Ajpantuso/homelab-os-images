@@ -5,12 +5,23 @@
 ---
 - gather_facts: true
   hosts: pki
+  pre_tasks:
+  - name: Fetch OIDC configuration from PKI server
+    ansible.builtin.uri:
+      url: "https://srv-001.ajphome.com/pki/k0s-pki-oidc.yaml"
+      return_content: true
+    register: oidc_config_response
+  - name: Parse OIDC configuration
+    ansible.builtin.set_fact:
+      oidc_config: "{{ oidc_config_response.content | from_yaml }}"
   roles:
   - role: common
   - role: single-node-k0s
     vars:
       k0s_version: v1.33.4+k0s.0
-      k0s_config_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-pki/refs/heads/main/k0s/pki.clusterconfig.yaml"
+      k0s_config_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-pki/refs/heads/main/k0s/pki.clusterconfig.yaml.j2"
       k0s_address: "{{ ansible_default_ipv4.address }}"
+      oidc_issuer_url: "{{ oidc_config.issuer_url }}"
+      oidc_client_url: "{{ oidc_config.client_id }}"
       k0s_updateconfig_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-pki/refs/heads/main/k0s/periodic-weekly.updateconfig.yaml"
       flux_manifest_url: "https://github.com/Ajpantuso/homelab-pki/flux"
