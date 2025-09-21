@@ -5,6 +5,15 @@
 ---
 - gather_facts: true
   hosts: core
+  pre_tasks:
+  - name: Fetch OIDC configuration
+    ansible.builtin.uri:
+      url: "http://srv-001.ajphome.com/pki/k0s-core-oidc.yaml"
+      return_content: true
+    register: oidc_config_response
+  - name: Parse OIDC configuration
+    ansible.builtin.set_fact:
+      oidc_config: "{{ oidc_config_response.content | from_yaml }}"
   roles:
   - role: common
   - role: single-node-k0s
@@ -12,5 +21,7 @@
       k0s_version: v1.33.4+k0s.0
       k0s_config_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-infra/refs/heads/main/k0s/core.clusterconfig.yaml"
       k0s_address: "{{ ansible_default_ipv4.address }}"
+      k0s_oidc_issuer_url: "{{ oidc_config.issuer_url }}"
+      k0s_oidc_client_id: "{{ oidc_config.client_id }}"
       k0s_updateconfig_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-infra/refs/heads/main/k0s/periodic-weekly.updateconfig.yaml"
       flux_manifest_url: "https://github.com/Ajpantuso/homelab-infra/flux"
