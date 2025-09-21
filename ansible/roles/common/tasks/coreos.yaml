@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Unlicense
 
 ---
-- name: Install additional packages
+- name: Install extra package {{ item }}
   become: true
   community.general.rpm_ostree_pkg:
     name: "{{ item }}"
@@ -12,6 +12,7 @@
   - udisks2
   - ansible
   - python3-pip
+  notify: reboot host
 - name: Ensure configuration files
   become: true
   ansible.builtin.copy:
