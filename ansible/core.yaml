@@ -13,3 +13,4 @@
       k0s_config_src: "../../../overlays/core/etc/k0s/k0s.yaml"
       k0s_address: "{{ ansible_default_ipv4.address }}"
       k0s_updateconfig_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-infra/refs/heads/main/k0s/periodic-weekly.updateconfig.yaml"
+      flux_manifest_url: "https://github.com/Ajpantuso/homelab-infra/tree/main/flux"
