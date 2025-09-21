@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+apiVersion: k0s.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s
+spec:
+  api:
+    address: "{{ address }}"
+    k0sApiPort: 9443
+    port: 6443
+    sans:
+    - "{{ address }}"
+    - pki
+    - 127.0.0.1
+  extensions:
+    helm:
+      charts:
+      - chartname: fluxcd-community/flux2
+        name: flux2
+        namespace: flux-system
+        order: 1
+        version: 2.12.4
+      repositories:
+      - name: fluxcd-community
+        url: https://fluxcd-community.github.io/helm-charts
+  installConfig:
+    users:
+      etcdUser: etcd
+      kineUser: kube-apiserver
+      konnectivityUser: konnectivity-server
+      kubeAPIserverUser: kube-apiserver
+      kubeSchedulerUser: kube-scheduler
+  konnectivity:
+    adminPort: 8133
+    agentPort: 8132
+  network:
+    kubeProxy:
+      disabled: false
+      mode: iptables
+    kuberouter:
+      autoMTU: true
+      mtu: 0
+      peerRouterASNs: ""
+      peerRouterIPs: ""
+    podCIDR: 10.244.0.0/16
+    provider: kuberouter
+    serviceCIDR: 10.96.0.0/12
+  podSecurityPolicy:
+    defaultPolicy: 00-k0s-privileged
+  storage:
+    etcd:
+      peerAddress: "{{ address }}"
+    type: etcd
+  telemetry:
+    enabled: true

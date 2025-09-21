@@ -7,7 +7,7 @@
   hosts: core
   roles:
   - role: common
-  - role: k0s
+  - role: single-node-k0s
     vars:
       k0s_version: v1.33.4+k0s.0
       k0s_config_src: "../../../overlays/core/etc/k0s/k0s.yaml"
