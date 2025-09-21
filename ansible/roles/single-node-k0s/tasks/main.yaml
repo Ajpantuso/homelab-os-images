@@ -33,7 +33,7 @@
   vars:
     address: "{{ k0s_address }}"
     oidc_issuer_url: "{{ k0s_oidc_issuer_url }}"
-    oidc_client_url: "{{ k0s_oidc_client_url }}"
+    oidc_client_id: "{{ k0s_oidc_client_id }}"
   notify: Restart k0scontroller
   when: k0s_config_url is defined
 
