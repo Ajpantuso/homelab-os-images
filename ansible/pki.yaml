@@ -10,5 +10,7 @@
   - role: single-node-k0s
     vars:
       k0s_version: v1.33.4+k0s.0
-      k0s_config_src: "../../../overlays/pki/etc/k0s/k0s.yaml"
+      k0s_config_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-pki/refs/heads/main/k0s/pki.clusterconfig.yaml"
       k0s_address: "{{ ansible_default_ipv4.address }}"
+      k0s_updateconfig_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-pki/refs/heads/main/k0s/periodic-weekly.updateconfig.yaml"
+      flux_manifest_url: "https://github.com/Ajpantuso/homelab-pki/flux"
