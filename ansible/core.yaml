@@ -6,21 +6,29 @@
 - gather_facts: true
   hosts: core
   pre_tasks:
-  - name: Fetch OIDC configuration
+  - name: Fetch config
     ansible.builtin.uri:
-      url: "http://srv-001.ajphome.com/pki/k0s-core-oidc.yaml"
+      url: "https://raw.githubusercontent.com/Ajpantuso/homelab-core/refs/heads/main/config.yaml"
       return_content: true
-    register: oidc_config_response
+    register: raw_config
+  - name: Parse config
+    ansible.builtin.set_fact:
+      config: "{{ raw_config.content | from_yaml }}"
+  - name: Fetch OIDC config
+    ansible.builtin.uri:
+      url: "{{ config.oidc.config_url }}"
+      return_content: true
+    register: raw_oidc_config
   - name: Parse OIDC configuration
     ansible.builtin.set_fact:
-      oidc_config: "{{ oidc_config_response.content | from_yaml }}"
+      oidc_config: "{{ raw_oidc_config.content | from_yaml }}"
   roles:
   - role: common
   - role: single-node-k0s
     vars:
-      k0s_version: v1.33.4+k0s.0
-      k0s_config_url: "https://raw.githubusercontent.com/Ajpantuso/homelab-infra/refs/heads/main/k0s/core.clusterconfig.yaml.j2"
+      k0s_version: "{{ config.k0s.version }}"
+      k0s_config_url: "https://raw.githubusercontent.com/{{ config.repo }}/refs/heads/main{{ config.k0s.config_path }}"
       k0s_address: "{{ ansible_default_ipv4.address }}"
       k0s_oidc_issuer_url: "{{ oidc_config.issuer_url }}"
       k0s_oidc_client_id: "{{ oidc_config.client_id }}"
-      flux_manifest_url: "https://github.com/Ajpantuso/homelab-infra/flux"
+      flux_manifest_url: "https://github.com/{{ config.repo }}{{ config.flux.kustomize_dir }}"
