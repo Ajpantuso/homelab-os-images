@@ -2,7 +2,17 @@
 #
 # SPDX-License-Identifier: Unlicense
 
+FROM registry.fedoraproject.org/fedora AS source
+
+RUN dnf install -y ipxe-bootimgs-x86 ipxe-bootimgs-aarch64
+
 FROM dockurr/dnsmasq:latest
 
-COPY tftpboot /var/lib/tftpboot
+COPY --from=source [ \
+    "/usr/share/ipxe/undionly.kpxe", \
+    "/usr/share/ipxe/ipxe-x86_64.efi", \
+    "/usr/share/ipxe/ipxe-i386.efi", \
+    "/var/lib/tftpboot/" \
+]
+COPY boot.ipxe /var/lib/tftpboot/menu/
 COPY dnsmasq.conf /etc/dnsmasq.conf
