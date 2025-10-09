@@ -24,7 +24,7 @@ COREOS_ISO_OUTPUT := coreos.iso
 COREOS_VERSION := 42.20250901.3.0
 TARGET_SYSTEM_ARCH := x86_64
 COREOS_DOWNLOAD_URL := https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/$(COREOS_VERSION)/$(TARGET_SYSTEM_ARCH)
-COREOS_ISO_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live.$(TARGET_SYSTEM_ARCH).iso
+COREOS_ISO_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-iso.$(TARGET_SYSTEM_ARCH).iso
 COREOS_KERNEL_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-kernel.$(TARGET_SYSTEM_ARCH)
 COREOS_INITRAMFS_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-initramfs.$(TARGET_SYSTEM_ARCH).img
 COREOS_ROOTFS_URL := $(COREOS_DOWNLOAD_URL)/fedora-coreos-$(COREOS_VERSION)-live-rootfs.$(TARGET_SYSTEM_ARCH).img
@@ -56,7 +56,7 @@ PKI_IGNITION_PATH := $(PXE_COREOS_DIR)/pki.ign
 PKI_BUTANE_PATH := $(CURDIR)/ignition/pki.bu
 
 push-pxe-tftp-image: build-pxe-tftp-image
-	$(CONTAINER_ENGINE) push ${REGISTRY_OPTIONS} "${CONTAINER_REGISTRY}/pxe-tftp:latest"
+	$(CONTAINER_ENGINE) push "${CONTAINER_REGISTRY}/pxe-tftp:latest"
 .PHONY: push-pxe-tftp-image
 
 build-pxe-tftp-image:
@@ -64,7 +64,7 @@ build-pxe-tftp-image:
 .PHONY: build-pxe-tftp-image
 
 push-pxe-http-image: build-pxe-http-image
-	$(CONTAINER_ENGINE) push ${REGISTRY_OPTIONS} "${CONTAINER_REGISTRY}/pxe-http:latest"
+	$(CONTAINER_ENGINE) push "${CONTAINER_REGISTRY}/pxe-http:latest"
 .PHONY: push-pxe-http-image
 
 build-pxe-http-image: coreos-generate-pxe
@@ -161,7 +161,7 @@ pki-generate-ignition:
 
 coreos-generate-iso: ## Generate CoreOS ISO
 	mkdir -p "$(TMP_DIR)"
-	"$(DOWNLOAD_FROM_URL)" "$(COREOS_ISO_URL)" "$(COREOS_ISO_PATH)"
+	curl -sSL -o "$(COREOS_ISO_PATH)" "$(COREOS_ISO_URL)"
 	coreos-installer iso customize \
 		--dest-console ttyS0,115200n8 \
 		--dest-console tty0 \
