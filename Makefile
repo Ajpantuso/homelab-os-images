@@ -54,6 +54,8 @@ CORE_IGNITION_PATH := $(PXE_COREOS_DIR)/core.ign
 CORE_BUTANE_PATH := $(CURDIR)/ignition/core.bu
 PKI_IGNITION_PATH := $(PXE_COREOS_DIR)/pki.ign
 PKI_BUTANE_PATH := $(CURDIR)/ignition/pki.bu
+STORAGE_IGNITION_PATH := $(PXE_COREOS_DIR)/storage.ign
+STORAGE_BUTANE_PATH := $(CURDIR)/ignition/storage.bu
 
 push-pxe-tftp-image: build-pxe-tftp-image
 	$(CONTAINER_ENGINE) push "${CONTAINER_REGISTRY}/pxe-tftp:latest"
@@ -71,7 +73,7 @@ build-pxe-http-image: coreos-generate-pxe
 	$(CONTAINER_ENGINE) build -t "${CONTAINER_REGISTRY}/pxe-http:latest" containers/pxe-http
 .PHONY: build-pxe-http-image
 
-coreos-generate-pxe: k0s-generate-ignition core-generate-ignition pki-generate-ignition ## Generate CoreOS PXE artifacts
+coreos-generate-pxe: k0s-generate-ignition core-generate-ignition pki-generate-ignition storage-generate-ignition ## Generate CoreOS PXE artifacts
 	mkdir -p $(PXE_COREOS_DIR)
 	curl -sSL -o "$(COREOS_KERNEL_OUTPUT)" "$(COREOS_KERNEL_URL)"
 	curl -sSL -o "$(COREOS_ROOTFS_OUTPUT)" "$(COREOS_ROOTFS_URL)"
@@ -159,7 +161,17 @@ pki-generate-ignition:
 		> $(PKI_IGNITION_PATH)
 .PHONY: pki-generate-ignition
 
-coreos-generate-iso: ## Generate CoreOS ISO
+storage-generate-ignition:
+	cp -r ./overlays $(DATA_DIR)
+	mkdir -p $$(dirname $(STORAGE_IGNITION_PATH))
+	butane \
+		--pretty --strict \
+		--files-dir $(DATA_DIR) \
+		< $(STORAGE_BUTANE_PATH) \
+		> $(STORAGE_IGNITION_PATH)
+.PHONY: pki-generate-ignition
+
+coreos-generate-iso:
 	mkdir -p "$(TMP_DIR)"
 	curl -sSL -o "$(COREOS_ISO_PATH)" "$(COREOS_ISO_URL)"
 	coreos-installer iso customize \

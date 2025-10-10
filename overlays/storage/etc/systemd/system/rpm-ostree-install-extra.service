@@ -1,0 +1,16 @@
+[Unit]
+Description=Layer extra rpms
+Wants=network-online.target
+After=network-online.target
+Before=zincati.service
+ConditionPathExists=!/var/lib/%N.stamp
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive udisks2 ansible python3-pip
+ExecStart=/bin/touch /var/lib/%N.stamp
+ExecStart=/bin/systemctl --no-block reboot
+
+[Install]
+WantedBy=multi-user.target

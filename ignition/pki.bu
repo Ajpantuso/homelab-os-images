@@ -44,6 +44,10 @@ storage:
     mode: 0644
     contents:
       source: http://srv-001.ajphome.com/pki/root-ca.crt
+  - path: /etc/ssh/trusted-user-ca-keys.pem
+    mode: 0644
+    contents:
+      source: http://vault.ajphome.com/v1/ssh-ca/public_key
 systemd:
   units:
   - name: rpm-ostree-install-extra.service

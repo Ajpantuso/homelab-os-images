@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2025 NONE
+#
+# SPDX-License-Identifier: Unlicense
+
+---
+- gather_facts: true
+  hosts: storage
+  pre_tasks:
+  - name: Fetch config
+    ansible.builtin.uri:
+      url: "https://raw.githubusercontent.com/Ajpantuso/homelab-storage/refs/heads/main/config.yaml"
+      return_content: true
+    register: raw_config
+  - name: Parse config
+    ansible.builtin.set_fact:
+      config: "{{ raw_config.content | from_yaml }}"
+  - name: Fetch OIDC config
+    ansible.builtin.uri:
+      url: "{{ config.oidc.config_url }}"
+      return_content: true
+    register: raw_oidc_config
+  - name: Parse OIDC configuration
+    ansible.builtin.set_fact:
+      oidc_config: "{{ raw_oidc_config.content | from_yaml }}"
+  roles:
+  - role: common
+  - role: single-node-k0s
+    vars:
+      k0s_version: "{{ config.k0s.version }}"
+      k0s_config_url: "https://raw.githubusercontent.com/{{ config.repo }}/refs/heads/main{{ config.k0s.config_path }}"
+      k0s_address: "{{ ansible_default_ipv4.address }}"
+      k0s_oidc_issuer_url: "{{ oidc_config.issuer_url }}"
+      k0s_oidc_client_id: "{{ oidc_config.client_id }}"
+      flux_manifest_url: "https://github.com/{{ config.repo }}{{ config.flux.kustomize_dir }}"

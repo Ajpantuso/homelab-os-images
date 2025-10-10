@@ -8,20 +8,6 @@ passwd:
     - wheel
     shell: /bin/bash
 storage:
-  disks:
-  - device: /dev/sda
-    wipe_table: true
-    partitions:
-    - size_mib: 0
-      start_mib: 0
-      wipe_partition_entry: true
-      label: ebs
-  filesystems:
-  - path: /var/openebs/local
-    device: /dev/disk/by-partlabel/ebs
-    format: ext4
-    wipe_filesystem: true
-    with_mount_unit: true
   files:
   - path: /etc/zincati/config.d/51-rollout-wariness.toml
     contents:
@@ -38,7 +24,7 @@ storage:
       local: overlays/coreos/etc/ssh/sshd_config.d/90-ssh-ca.conf
   - path: /etc/ansible/hosts
     contents:
-      local: overlays/k0s/etc/ansible/hosts
+      local: overlays/storage/etc/ansible/hosts
   - path: /etc/pki/ca-trust/source/anchors/root-ca.crt
     mode: 0644
     contents:
@@ -51,7 +37,7 @@ systemd:
   units:
   - name: rpm-ostree-install-extra.service
     enabled: true
-    contents_local: overlays/k0s/etc/systemd/system/rpm-ostree-install-extra.service
+    contents_local: overlays/storage/etc/systemd/system/rpm-ostree-install-extra.service
   - name: ansible-pull.service
     enabled: false
     contents_local: overlays/coreos/etc/systemd/system/ansible-pull.service
