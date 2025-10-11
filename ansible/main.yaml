@@ -6,3 +6,4 @@
 - ansible.builtin.import_playbook: k0s.yaml
 - ansible.builtin.import_playbook: core.yaml
 - ansible.builtin.import_playbook: pki.yaml
+- ansible.builtin.import_playbook: storage.yaml
