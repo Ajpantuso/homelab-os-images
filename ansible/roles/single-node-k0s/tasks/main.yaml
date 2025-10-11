@@ -57,6 +57,13 @@
     cmd: /usr/local/bin/k0s install controller --single --config /etc/k0s/k0s.yaml
   when: not k0scontroller_service_stat.stat.exists
 
+- name: Start and enable k0scontroller service
+  become: true
+  ansible.builtin.systemd:
+    name: k0scontroller.service
+    state: started
+    enabled: true
+
 - name: Get kubeconfig from k0s
   become: true
   ansible.builtin.command:
@@ -98,8 +105,14 @@
 
 
 - name: Apply flux manifest
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('kubernetes.core.kustomize', dir=flux_manifest_url) }}"
-    kubeconfig: "{{ ansible_user_dir }}/.kube/config"
+  ansible.builtin.command:
+    cmd: >
+      kubectl apply
+      --kustomize "{{ flux_manifest_url }}" --prune --all
+      --prune-allowlist=source.toolkit.fluxcd.io/v1/gitrepository
+      --prune-allowlist=source.toolkit.fluxcd.io/v1beta2/helmrepository
+      --prune-allowlist=helm.toolkit.fluxcd.io/v2beta2/helmrelease
+      --prune-allowlist=kustomize.toolkit.fluxcd.io/v1/kustomization
+  environment:
+    KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
   when: flux_manifest_url is defined
