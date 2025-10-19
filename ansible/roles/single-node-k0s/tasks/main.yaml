@@ -116,3 +116,95 @@
   environment:
     KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
   when: flux_manifest_url is defined
+
+- name: Check if DirectPV kustomization exists and is ready
+  kubernetes.core.k8s_info:
+    api_version: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    name: directpv
+    namespace: flux-system
+  register: directpv_kustomization
+
+- name: Initialize DirectPV if kustomization is ready
+  when: >
+    directpv_kustomization.resources | length > 0 and
+    directpv_kustomization.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | selectattr('status', 'equalto', 'True') | list | length > 0
+  block:
+    - name: Get DirectPV latest release version
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/minio/directpv/releases/latest
+        return_content: true
+      register: directpv_release
+
+    - name: Download kubectl-directpv plugin
+      become: true
+      ansible.builtin.get_url:
+        url: "https://github.com/minio/directpv/releases/download/{{ directpv_release.json.tag_name }}/kubectl-directpv_{{ directpv_release.json.tag_name }}_linux_amd64"
+        dest: "/usr/local/bin/kubectl-directpv"
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Get all CSI nodes
+      kubernetes.core.k8s_info:
+        api_version: storage.k8s.io/v1
+        kind: CSINode
+      register: csi_nodes
+
+    - name: Update DirectPV CSI nodes
+      kubernetes.core.k8s:
+        api_version: storage.k8s.io/v1
+        kind: CSINode
+        name: "{{ item.metadata.name }}"
+        definition:
+          spec:
+            drivers: "{{ (item.spec.drivers | default([]) | rejectattr('name', 'equalto', 'directpv.min.io') | list) + [directpv_driver] }}"
+      vars:
+        directpv_driver:
+          name: directpv.min.io
+          nodeID: "{{ item.metadata.name }}"
+          topologyKeys:
+            - directpv.min.io/identity
+            - directpv.min.io/node
+            - directpv.min.io/rack
+            - directpv.min.io/region
+            - directpv.min.io/zone
+      loop: "{{ csi_nodes.resources }}"
+      loop_control:
+        label: "{{ item.metadata.name }}"
+
+    - name: Get DirectPV nodes
+      kubernetes.core.k8s_info:
+        api_version: directpv.min.io/v1beta1
+        kind: DirectPVNode
+      register: directpv_nodes
+
+    - name: Build DirectPV init config nodes
+      ansible.builtin.set_fact:
+        directpv_init_nodes: >-
+          {{
+            directpv_nodes.resources | map('community.general.json_query', node_query) | list
+          }}
+      vars:
+        node_query: >-
+          {
+            name: metadata.name,
+            drives: status.devices[?!denyReason].{
+              id: id,
+              name: name,
+              size: totalCapacity,
+              make: make,
+              select: 'yes'
+            }
+          }
+
+    - name: Initialize DirectPV drives
+      ansible.builtin.command:
+        cmd: kubectl directpv init --dangerous
+        stdin: "{{ directpv_init_config | to_nice_yaml }}"
+      environment:
+        KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+      vars:
+        directpv_init_config:
+          version: v1
+          nodes: "{{ directpv_init_nodes }}"
