@@ -51,3 +51,4 @@
     url: "{{ vault_ssh_ca_url }}"
     dest: /etc/ssh/trusted-user-ca-keys.pem
   notify: restart ssh
+  ignore_errors: true
