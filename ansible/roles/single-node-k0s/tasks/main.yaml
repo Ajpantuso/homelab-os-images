@@ -200,13 +200,18 @@
             }
           }
 
-    - name: Initialize DirectPV drives
-      ansible.builtin.command:
-        cmd: kubectl directpv init --dangerous
-        stdin: "{{ directpv_init_config | to_nice_yaml }}"
-      environment:
-        KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+    - name: Write DirectPV init config
+      ansible.builtin.copy:
+        content: "{{ directpv_init_config | to_nice_yaml }}"
+        dest: /tmp/directpv-drives.yaml
+        mode: '0644'
       vars:
         directpv_init_config:
           version: v1
           nodes: "{{ directpv_init_nodes }}"
+
+    - name: Initialize DirectPV drives
+      ansible.builtin.command:
+        cmd: kubectl directpv init /tmp/directpv-drives.yaml --dangerous
+      environment:
+        KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
