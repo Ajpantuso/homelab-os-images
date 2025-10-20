@@ -139,7 +139,7 @@
     - name: Download kubectl-directpv plugin
       become: true
       ansible.builtin.get_url:
-        url: "https://github.com/minio/directpv/releases/download/{{ directpv_release.json.tag_name }}/kubectl-directpv_{{ directpv_release.json.tag_name }}_linux_amd64"
+        url: "https://github.com/minio/directpv/releases/download/{{ directpv_release.json.tag_name }}/kubectl-directpv_{{ directpv_release.json.tag_name | regex_replace('^v', '') }}_linux_amd64"
         dest: "/usr/local/bin/kubectl-directpv"
         mode: '0755'
         owner: root
