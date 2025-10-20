@@ -83,10 +83,12 @@
     dest: "{{ ansible_user_dir }}/.kube/config"
     mode: '0600'
 
-- name: Install python kubernetes library
+- name: Install python libraries
   become: true
   ansible.builtin.pip:
-    name: kubernetes
+    name:
+      - kubernetes
+      - jmespath
 
 - name: Get kubectl stable version
   ansible.builtin.uri:
