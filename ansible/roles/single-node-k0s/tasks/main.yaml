@@ -212,6 +212,6 @@
 
     - name: Initialize DirectPV drives
       ansible.builtin.shell:
-        cmd: script -q -e -c "kubectl directpv init /tmp/directpv-drives.yaml --dangerous" /dev/null
+        cmd: kubectl directpv init /tmp/directpv-drives.yaml --dangerous
       environment:
         KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
