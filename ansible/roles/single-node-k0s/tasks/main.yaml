@@ -102,6 +102,7 @@
   ansible.builtin.uri:
     url: "https://dl.k8s.io/release/stable.txt"
     return_content: true
+    timeout: 60
   register: kubectl_version_result
 
 - name: Download kubectl
