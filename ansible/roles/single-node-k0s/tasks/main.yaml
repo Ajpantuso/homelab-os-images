@@ -64,6 +64,14 @@
     state: started
     enabled: true
 
+- name: Ensure kubelet symlink exists
+  become: true
+  ansible.builtin.file:
+    src: /var/lib/k0s/kubelet
+    dest: /var/lib/kubelet
+    state: link
+    force: true
+
 - name: Get kubeconfig from k0s
   become: true
   ansible.builtin.command:
