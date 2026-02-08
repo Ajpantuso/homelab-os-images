@@ -19,6 +19,7 @@
     dest: /usr/local/bin/k0s
     state: link
     force: true
+  notify: Restart k0scontroller
 - name: Ensure '/etc/k0s' directory
   become: true
   ansible.builtin.file:
